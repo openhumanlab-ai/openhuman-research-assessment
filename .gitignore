@@ -1,0 +1,23 @@
+# Credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Local development files
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+
+# Keep submissions visible to Git: runs/, analysis, prompts, data, and
+# ai-history/ are intentionally NOT ignored.
+# Pack archives and private interviewer material
+/*.zip
+/exports/
+/interviewer/
+/materials-rehearsal/

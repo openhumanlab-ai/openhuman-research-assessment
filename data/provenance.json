@@ -1,0 +1,7 @@
+{
+  "origin": "Fictional persona descriptions and purchasing scenarios authored with AI assistance for the OpenHuman research work sample. No human or customer records.",
+  "files": {
+    "data/personas.jsonl": "5dffaa5079df8ec3c34409f1d9e5349791ae06946cd3927146b405189dcab9ac",
+    "data/scenarios.jsonl": "a936377006a11a65b436e85945cd732b662d649fd190f6e0dc4eb41185c5c255"
+  }
+}
