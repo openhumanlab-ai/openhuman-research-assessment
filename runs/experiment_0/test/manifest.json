@@ -1,0 +1,31 @@
+{
+  "schema_version": 2,
+  "mode": "live",
+  "status": "completed",
+  "started_at": "2026-11-24T15:03:22.422214+00:00",
+  "finished_at": "2026-11-24T15:03:36.716538+00:00",
+  "requested_model": "gpt-5.1-2025-11-13",
+  "endpoint": "https://api.openai.com/v1/chat/completions",
+  "settings": {
+    "max_completion_tokens": 2048,
+    "temperature": null,
+    "timeout_seconds": 60,
+    "automatic_retries": 0,
+    "conversation_per_trial": "fresh"
+  },
+  "planned_calls": 6,
+  "attempted_calls": 6,
+  "successful_calls": 6,
+  "invalid_outputs": 0,
+  "transport_errors": 0,
+  "input_sha256": {
+    "personas.jsonl": "5dffaa5079df8ec3c34409f1d9e5349791ae06946cd3927146b405189dcab9ac",
+    "scenarios.jsonl": "a936377006a11a65b436e85945cd732b662d649fd190f6e0dc4eb41185c5c255",
+    "trials.jsonl": "e3f442bb15b34ba87aa5c797a529d3d7540eacc7131eb6d1213e6698080067a1",
+    "decision.txt": "57f895fc6554e01dec1da7b4087625b054882d519320b7e1262b1b8a37ced529",
+    "run.py": "bfbdf7e9e8c959fc8b269a3cc91cdcefe9137f1c0c1143763933840473f1423d"
+  },
+  "requests_sha256": "e4b3369ad3534e7e323df2c1a5f58615b1b40c36da251b9c80db4ea05cb9ac69",
+  "note": "A prepared run has no responses. Live outputs are model simulations, not human data.",
+  "unattempted_calls": 0
+}
