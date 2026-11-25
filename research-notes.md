@@ -12,25 +12,18 @@ Also re-organised the original structure into experiment 1, 2, ...
 
 before any initial research questions can be asked, I did some exploratory literature review on what's already been done in in this space, to get a sense of the research space. prompted claude to generate most relevant papers in the space of LLM predicting buying purchase choices on prompted traits. Papers found:
 
-Choi et al. (2026), "What Makes a Sale?"
-
-Allouah et al. (2025), "What Is Your AI Agent Buying?"
-
-Gui & Toubia (2023, revised 2025), "The Challenge of Using LLMs to Simulate Human Behavior"
-
-Brand, Israeli & Ngwe (2023), "Using LLMs for Market Research"
-
-Horton, Filippas & Manning (2023, revised 2026), "Homo Silicus"
-
-Reusens et al. (2026), "Would a Large Language Model Pay Extra for a View? Inferring Willingness to Pay from Subjective Choices"
-
-Mohammadi (2024, revised 2026), "Token Noise and the Illusion of Preference: A Shapley Value Framework for Auditing LLM-Simulated Choice Experiments"
-
-Ren et al., "Persona Following Is Not Selective Control: The Neutrality Gap in LLM User Simulation"
+- Choi et al. (2026), "What Makes a Sale?"
+- Allouah et al. (2025), "What Is Your AI Agent Buying?"
+- Gui & Toubia (2023, revised 2025), "The Challenge of Using LLMs to Simulate Human Behavior"
+- Brand, Israeli & Ngwe (2023), "Using LLMs for Market Research"
+- Horton, Filippas & Manning (2023, revised 2026), "Homo Silicus"
+- Reusens et al. (2026), "Would a Large Language Model Pay Extra for a View? Inferring Willingness to Pay from Subjective Choices"
+- Mohammadi (2024, revised 2026), "Token Noise and the Illusion of Preference: A Shapley Value Framework for Auditing LLM-Simulated Choice Experiments"
+- Ren et al., "Persona Following Is Not Selective Control: The Neutrality Gap in LLM User Simulation"
 
 prompted claude to summarise the main methods, results and conclusions of each paper but also double checked the source paper for every strong claim (e.g. conclusions, specific numbers, ..). Finally, after reading through papers, claude was prompted to summarise.
 
-Main findings tables:
+**Main findings tables:**
 
 The two tables share the same numbering: the first covers what each study did, the second what it found. "Purchase choice?" marks whether the model's decision is a buying decision, meaning which product to buy or whether to buy at all, with a price involved.
 
@@ -64,26 +57,28 @@ Years shown are first-posting dates; papers 3, 4, 5 and 7 were read in their 202
 
 ### Research Question 1
 
-#### reasoning behind research question: 
+#### reasoning behind research question:
 
 several studies in the lit review found that an LLM will often closely follow the persona or budget label it's given. The price sensitive LLM will often pick the cheapest option. Reusens et al. shows 95% of choices went to the cheapest room if LLm is prompted as a budget-minded student (which bundles budget with identity and trip purpose). Mohammadi, 2024 found the budget concious persone chose the cheapest flight with prob close to 100% (one model, one flight task, already 0.915 with no persona), Horton, Filippas & Manning (2023) found near-total persona compliance. The simple test asks one question at one price (does price sensitive alex go for the 7pound option yes or no). let's say the answer is no every time. This has 3 weknesses:
 
-It only says that sensitive alex refuses 7pound, not at which price point it would also refuse.
-
-It may not tell sensitive alex apart from no-trait alex, who also chose to cook at 7pound in experiment 0 (one call only).
+- It only says that sensitive alex refuses 7pound, not at which price point it would also refuse.
+- Statistics are fully dependant on the test
+- An instruction would give the same result (price increase looks like it destroys demand so sim will always recommend lowest)
+- Test lacks sensitivity and suffers from ceiling effects
 
 the result would look exactly the same if the model were prompted to just pick the cheapest one, and no paper in the lit review ran an always cheapest control.
 
+Instead, we ask at many different prices and see how often each alex version still buys the expensive option at each price, compared with no-trait alex. The prices are the cheaper option's price plus a percentage, from 0% to 200% extra, for all three purchases. From this we read two points per alex version: the always-pays point (APP), the highest extra cost at which alex still buys in more than 95% of answers, and the never-pays point (NPP), the extra cost from which alex buys in fewer than 5% of answers. An always cheapest baseline has its APP at equal price and its NPP at the first step by definition. If sensitive alex has the same points as that baseline, this shows the model is just following the description like an order to pick the cheapest of the two options. If sensitive alex still buys at clearly higher prices, this shows the description works more like a preference, and the gap to no-trait alex tells us how strong that preference is.
 
-Instead, we could ask at many different prices and see what the highest price is that sensitive alex would still buy, compared with no-trait alex. An always cheapest baseline stops at £4 by definition, so the real question is whether sensitive alex pays any extra at all. To answer that we test small steps just above £4 (0.5%, 1%, 2%, 5%, 10% extra) and decide beforehand that less than 1% extra counts as nothing. If sensitive alex pays less than that, this shows the model is just following the description like an order to pick the cheapest of the two options. If sensitive Alex still buys at clearly higher prices, this shows the description works more like a preference, and the gap to no-trait alex tells us how strong that preference is.
+**Why:** one cutoff on the highest price still paid depended too much on single answers and on the order of the options. APP and NPP use all answers at each price and describe both ends of the line. The 95% and 5% limits were chosen after seeing the results.
 
 #### research question:
 
-At a single price, are the LLM's choices for high- and low-sensitivity Alex already all-or-nothing? Does recording the price at which Alex switches tell the high-sensitivity description apart from no-trait Alex, and from an explicit "always pick the cheapest" rule (does it pay 1% or more extra)?
+At a single price, are the LLM's choices for high- and low-sensitivity Alex already all-or-nothing? When the same purchase is asked on a price ladder, from equal price up to +200%, at what extra cost does the price sensitive alex stop picking the more expensive option. At what price does the low sensitivity alex stop always opting for the more expensive option. Can a price ladder help us answer these types of problems?
 
 #### further explanation of rq1:
 
-results could look like this : 
+results could look like this :
 
 | persona | simple test at £7: % that picks the cheaper option | price ladder: highest price still paid |
 | --- | --- | --- |
@@ -94,25 +89,34 @@ results could look like this :
 
 Part 1 of the question asks wether the simple test is too blunt to size the actual effect, so how close it is to 0% and 100%. This is an open question, because our description is softer than the labels in the papers. Part 2 of the question asks wether sensitive alex stops paying at the same point as the control (£4, known in advance), so really whether it pays any extra, measured in small steps and compared with no-trait alex. if it pays less than 5% extra, the description is just acting as an instruction and if it pays more the description is more realistically acting as a preference. Because the answer depends on how fine the price steps are, we report the amount with the step size. This research question compares two ways of testing on the same data and could give evidence of choosing one method over the other.
 
-#### rq1 research plan: 
+#### rq1 research plan:
 
-alex versions:
+**alex versions:**
 
-| persona_id | version |
+| persona_id | version | summary |
+| --- | --- | --- |
+| profile-03 | no trait | Alex lives in a flat and enjoys listening to music. All listed options are within Alex's budget and Alex trusts the stated purchase terms. Nothing is said about price. |
+| profile-02 | high sensitivity | Same as no trait, plus: when comparing affordable options, Alex "gives relatively high weight to differences in price while also considering the other features". |
+| profile-06 | high sensitivity (starter paraphrase) | Same as no trait, plus the high-sensitivity sentence reworded: differences in monetary cost "play a large part in Alex's choice alongside the other features". |
+| profile-01 | low sensitivity | Same as no trait, plus: when comparing affordable options, Alex "gives relatively little weight to differences in price and more weight to the other features". |
+| profile-05 | low sensitivity (starter paraphrase) | Same as no trait, plus the low-sensitivity sentence reworded: differences in monetary cost "play a small part in Alex's choice compared with other features". |
+
+**Scenarios (prices are the starter prices):**
+
+| scenario_id | summary |
 | --- | --- |
-| profile-03 | no trait |
-| profile-02 | high sensitivity |
-| profile-06 | high sensitivity (starter paraphrase) |
-| profile-01 | low sensitivity |
-| profile-05 | low sensitivity (starter paraphrase) |
+| `dinner` | Alex needs one dinner tonight: cook it from ingredients for £4, 35 minutes (`cook`), or buy a prepared dinner for £7, 5 minutes (`prepared`). Both are fine in taste and diet. `cook` is listed first. |
+| `dinner-reversed` | Same as `dinner`, with `prepared` listed first. |
+| `groceries` | Alex needs a grocery basket tomorrow: have it delivered to the flat for £34, 10 minutes (`deliver`), or collect it from the store for £30, 40 minutes (`collect`). Same contents and quality. `deliver` is listed first. |
+| `groceries-reversed` | Same as `groceries`, with `collect` listed first. |
+| `headphones` | Alex needs headphones for music at home: wired ones for £25 (`wired`), or wireless ones for £45 that allow moving around the room and need charging once a week (`wireless`). Same sound quality and two-year life. `wired` is listed first. |
+| `headphones-reversed` | Same as `headphones`, with `wireless` listed first. |
 
-Scenarios: `dinner`, `dinner-reversed`, `groceries`, `groceries-reversed`, `headphones`, `headphones-reversed`
-
-Changes to scenarios: we only change the price of the expensive option in the text (7 pound dinner, 34 pound delivery and 45 pound wireless)
+**Changes to scenarios:** we only change the price of the expensive option in the text (7 pound dinner, 34 pound delivery and 45 pound wireless)
 
 The option_ids and the option order stay exactly as in the starter. Whole-pound prices are written as in the starter ("£6"), other prices with pence ("£4.20").
 
-Price ladder: 
+**Price ladder:**
 
 Each price is the cheaper option's price plus a percentage. The same percentages are used in every scenario. Prices are rounded to the nearest penny.
 
@@ -133,21 +137,23 @@ Each price is the cheaper option's price plus a percentage. The same percentages
 | 100% | £8 | £60 | £50 |
 | 150% | £10 | £75 | £62.50 |
 
- The starter-price row (75% for dinner, 13.3% for groceries, 80% for headphones) is the simple one-price test from the starter pack, so we get that test from the same data.
+The starter-price row (75% for dinner, 13.3% for groceries, 80% for headphones) is the simple one-price test from the starter pack, so we get that test from the same data.
 
 No need to run an always cheapest pick control since we can just generate this data during analysis or later (we already know what the choice will be)
 
-84 scenarios (3 base-scenarios x 14 prices x 2 orders). Each of the 6 starter scenarios is copied once per price. The id carries the percentage in tenths of a percent, for example `dinner-pct0005` (0.5%), `dinner-pct0750` (75%, starter price), `groceries-reversed-pct0133` (13.3%, starter price) and `headphones-pct0800` (80%, starter price). 
+84 scenarios (3 base-scenarios x 14 prices x 2 orders). Each of the 6 starter scenarios is copied once per price. The id carries the percentage in tenths of a percent, for example `dinner-pct0005` (0.5%), `dinner-pct0750` (75%, starter price), `groceries-reversed-pct0133` (13.3%, starter price) and `headphones-pct0800` (80%, starter price).
 
-84 records is a lot to write by hand so I'll write a script to automate that 
+84 records is a lot to write by hand so I'll write a script to automate that
+
 run everything twice (r1 and r2), to see if the same call gives the same answer.
 
-Number of calls:
+**Number of calls:**
 
 5 alex versions x 14 prices x 3 base-scenarios x 2 orders = 420 calls per round. This gives a total of 840 calls including the second round
 
 The runner refuses more than 200 trials in one run unless told otherwise, so each round gets its own trials file and its own run with `--max-calls 420`.
 
+**Trial file fields:**
 
 - `trial_id`: unique, made of round, persona and scenario, for example `r1-profile-02-dinner-reversed-pct0750`
 - `persona_id`: one of the 5 alex versions
@@ -155,11 +161,13 @@ The runner refuses more than 200 trials in one run unless told otherwise, so eac
 - `condition`: persona, base-scenario, percentage and order, for example `profile-02;dinner;pct0750;reversed` (not shown to the model)
 - `replicate_id`: `r1` or `r2`
 
+**Run settings:**
+
 - model: gpt-5.1-2025-11-13
 - prompts/decision.txt unchanged
 - runner default settings (no temperature flag); only `--max-calls` is raised to 420, which is a safety cap and not a model setting
 
-Rules for reading the results:
+**Rules for reading the results:**
 
 At each price we have 4 answers per alex version per base-scenario (2 orders x 2 rounds). Alex "still pays" at a price if at least 2 of the 4 answers pick the expensive option. The highest price still paid is the highest price at which this is true.
 
@@ -167,9 +175,9 @@ At each price we have 4 answers per alex version per base-scenario (2 orders x 2
 - if alex still pays at 150%, we report "more than 150%" and not a number
 - if alex stops and then pays again at a higher price, we count that as a flip back, report how often it happens, and also give the first price at which alex stopped
 
-Commands:
+**Commands:**
 
-Files used: `experiment_1/scenarios.jsonl` (the 84 scenarios), `experiment_1/trials_r1.jsonl` and `experiment_1/trials_r2.jsonl` (420 trials each). Personas and the decision prompt are not passed, so the runner uses the starter originals (`data/personas.jsonl` and `prompts/decision.txt`).
+**Files used:** `experiment_1/scenarios.jsonl` (the 84 scenarios), `experiment_1/trials_r1.jsonl` and `experiment_1/trials_r2.jsonl` (420 trials each). Personas and the decision prompt are not passed, so the runner uses the starter originals (`data/personas.jsonl` and `prompts/decision.txt`).
 
 Run from the repository root, in this order: check (no model calls), prepare (no model calls, then inspect `runs/rq1-round1-preview/requests.jsonl`), round 1 (420 paid calls), round 2 (420 paid calls).
 
@@ -201,9 +209,9 @@ python3 run.py run \
 
 Recorded on 25 November 2026, after seeing the results of rounds 1 and 2 and before running any extra calls. Rounds 1 and 2 were run with the price ladder, files and commands above this heading.
 
-What changes: 14 prices are added to the ladder: 15%, and every 10% up to 200% that was not tested yet. The original 14 prices and their 840 answers are kept and are not run again.
+**What changes:** 14 prices are added to the ladder: 15%, and every 10% up to 200% that was not tested yet. The original 14 prices and their 840 answers are kept and are not run again.
 
-Why: the tested prices between 13.3% and 150% were too far apart to say at which price each alex version stops paying. Three changes fell in untested gaps: no-trait alex went from 100% to 67% of answers picking the expensive option between 13.3% and 20%, high-sensitivity alex from 17% to 4% between 30% and 50%, and low-sensitivity alex from 96% to 83% between 50% and 75%. No-trait and low-sensitivity alex also still picked the expensive option at 150% (17% and 83% of answers), so the ladder is extended to 200%.
+**Why:** the tested prices between 13.3% and 150% were too far apart to say at which price each alex version stops paying. Three changes fell in untested gaps: no-trait alex went from 100% to 67% of answers picking the expensive option between 13.3% and 20%, high-sensitivity alex from 17% to 4% between 30% and 50%, and low-sensitivity alex from 96% to 83% between 50% and 75%. No-trait and low-sensitivity alex also still picked the expensive option at 150% (17% and 83% of answers), so the ladder is extended to 200%.
 
 These prices were chosen after seeing results, so they are a follow-up and not part of the original plan.
 
@@ -224,13 +232,46 @@ These prices were chosen after seeing results, so they are a follow-up and not p
 | 190% | £11.60 | £87 | £72.50 |
 | 200% | £12 | £90 | £75 |
 
-What stays the same: the 5 alex versions, the 6 starter scenarios, the prompt, the model (gpt-5.1-2025-11-13), the runner settings and the two rounds. Only the price of the expensive option changes.
+Full price ladder after this change: all 28 prices, the 14 original ones and the 14 extra ones (marked with *).
 
-Number of calls: 5 alex versions x 14 new prices x 3 base-scenarios x 2 orders = 420 calls per round, 840 in total. Together with the first 840 this gives 1,680 answers.
+| extra cost | dinner: `prepared` (cook is £4) | groceries: `deliver` (collect is £30) | headphones: `wireless` (wired is £25) |
+| --- | --- | --- | --- |
+| 0% | £4 | £30 | £25 |
+| 0.5% | £4.02 | £30.15 | £25.13 |
+| 1% | £4.04 | £30.30 | £25.25 |
+| 2% | £4.08 | £30.60 | £25.50 |
+| 5% | £4.20 | £31.50 | £26.25 |
+| 10% | £4.40 | £33 | £27.50 |
+| 13.3% | £4.53 | £34 (starter price) | £28.33 |
+| 15%* | £4.60 | £34.50 | £28.75 |
+| 20% | £4.80 | £36 | £30 |
+| 30% | £5.20 | £39 | £32.50 |
+| 40%* | £5.60 | £42 | £35 |
+| 50% | £6 | £45 | £37.50 |
+| 60%* | £6.40 | £48 | £40 |
+| 70%* | £6.80 | £51 | £42.50 |
+| 75% | £7 (starter price) | £52.50 | £43.75 |
+| 80% | £7.20 | £54 | £45 (starter price) |
+| 90%* | £7.60 | £57 | £47.50 |
+| 100% | £8 | £60 | £50 |
+| 110%* | £8.40 | £63 | £52.50 |
+| 120%* | £8.80 | £66 | £55 |
+| 130%* | £9.20 | £69 | £57.50 |
+| 140%* | £9.60 | £72 | £60 |
+| 150% | £10 | £75 | £62.50 |
+| 160%* | £10.40 | £78 | £65 |
+| 170%* | £10.80 | £81 | £67.50 |
+| 180%* | £11.20 | £84 | £70 |
+| 190%* | £11.60 | £87 | £72.50 |
+| 200%* | £12 | £90 | £75 |
 
-Rules for reading the results: unchanged, except that "more than 150%" becomes "more than 200%".
+**What stays the same:** the 5 alex versions, the 6 starter scenarios, the prompt, the model (gpt-5.1-2025-11-13), the runner settings and the two rounds. Only the price of the expensive option changes.
 
-Files: `experiment_1/generate_inputs.ipynb` now writes
+**Number of calls:** 5 alex versions x 14 new prices x 3 base-scenarios x 2 orders = 420 calls per round, 840 in total. Together with the first 840 this gives 1,680 answers.
+
+**Rules for reading the results:** unchanged, except that "more than 150%" becomes "more than 200%".
+
+**Files:** `experiment_1/generate_inputs.ipynb` now writes
 
 - `scenarios.jsonl`: 168 scenarios, the original 84 first and unchanged
 - `trials_r1.jsonl` and `trials_r2.jsonl`: 840 trials each, the original 420 first and unchanged
@@ -238,9 +279,9 @@ Files: `experiment_1/generate_inputs.ipynb` now writes
 
 The input files exactly as used in rounds 1 and 2 are saved in `runs/rq1-round1/inputs` and `runs/rq1-round2/inputs`.
 
-Limitation: the new prices are answered in a later session than the original prices, with the same model version and settings.
+**Limitation:** the new prices are answered in a later session than the original prices, with the same model version and settings.
 
-Commands:
+**Commands:**
 
 Run `experiment_1/generate_inputs.ipynb` first, then from the repository root in the same order as before: check, prepare, round 1 extra (420 paid calls), round 2 extra (420 paid calls). `--max-calls 420` also makes the runner refuse the full 840-trial files.
 
@@ -267,3 +308,56 @@ python3 run.py run \
   --max-calls 420 \
   --out runs/rq1-round2-extra
 ```
+
+#### results
+
+**Thresholds (set before the runs):** a share above 95% of answers choosing the more expensive option is classified as "always pays", and a share below 5% as "never pays"
+
+**APP (always-pays point):** The highest extra cost at which the persona still picks the more expensive option in more than 95% of answers. Up to here, the persona always pays.
+
+**NPP (never-pays point):** The lowest extra cost at which the persona picks the more expensive option in fewer than 5% of answers. From here on, the persona never pays.
+
+**SWITCH POINT:** The lowest extra cost at which the persona picks the more expensive option in fewer than 50% of answers. From here on, the persona mostly picks the cheaper option.
+
+##### how to read the APP and NPP numbers
+
+- Numbers combine the three purchases: 24 answers per price (12 for no-trait alex).
+- "More than 95%" means 23 or 24 of 24 answers; "fewer than 5%" means 0 or 1 of 24. For no trait: 12 of 12, or 0 of 12.
+- APP and NPP are tested prices, read at the first time the line leaves or enters the zone. A flip back (*) means the line comes back at a higher price.
+- At equal price all 60 answers pick the more expensive option, for every alex version.
+
+##### APP and NPP results
+
+| alex version | APP (always pays up to) | NPP (never pays from) |
+| --- | --- | --- |
+| always cheapest (by definition, not run) | equal price | +0.5% |
+| high sensitivity | equal price | +40% |
+| no trait | +15% | +180%* |
+| low sensitivity | +50% | none up to +200% |
+
+\* flip back: no-trait alex pays again at +190% (2 of 12) and +200% (1 of 12), so it has no stable NPP inside the ladder.
+
+**What this shows:**
+
+- The versions come out in the expected order: high sensitivity lets go first (equal price), then no trait (+15%), then low sensitivity (+50%).
+- High-sensitivity alex stops always paying at the same point as the always-cheapest baseline: at +0.5%, only 6 of 24 answers still pay.
+- It is not the same as the baseline after that: between +0.5% and +30%, 46 of 216 answers (21%) still pay. 38 of these are dinner, mostly with the prepared dinner listed first (31). In groceries and headphones it is at or next to the baseline.
+- No-trait alex has no stable NPP, and low-sensitivity alex never gets near one: at least 15 of 24 answers (62%) pay at every price up to +200%.
+- The purchases differ: the pooled APP of no-trait and low-sensitivity alex is the point where groceries drops. In groceries no-trait alex goes from 4 of 4 answers at +15% (£34.50) to 0 of 4 at +20% (£36).
+
+#### recommendations
+
+Price ladder measures a trade-off in price vs price sensitivity (response curve)
+
+**Allows us to:**
+
+- Simulate how demand falls off as price increases for different personas
+- Derive at what price the persona changes their mind (NPP, APP, switch point) instead of just whether it changes
+- Tell a realistic persona from rule-follower (steep drop off)
+- Reveal prompt effects that naïve method would hide (option order matters)
+- Determine the effect of confounding variables
+
+**Further research:**
+
+- Time ladder, income ladder, trait-strength ladder, age ladder, years-as-customer ladder, product rating ladder
+- Direct comparison to human survey data
