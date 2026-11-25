@@ -196,3 +196,74 @@ python3 run.py run \
   --max-calls 420 \
   --out runs/rq1-round2
 ```
+
+#### change to the rq1 plan after rounds 1 and 2: 14 extra prices
+
+Recorded on 25 November 2026, after seeing the results of rounds 1 and 2 and before running any extra calls. Rounds 1 and 2 were run with the price ladder, files and commands above this heading.
+
+What changes: 14 prices are added to the ladder: 15%, and every 10% up to 200% that was not tested yet. The original 14 prices and their 840 answers are kept and are not run again.
+
+Why: the tested prices between 13.3% and 150% were too far apart to say at which price each alex version stops paying. Three changes fell in untested gaps: no-trait alex went from 100% to 67% of answers picking the expensive option between 13.3% and 20%, high-sensitivity alex from 17% to 4% between 30% and 50%, and low-sensitivity alex from 96% to 83% between 50% and 75%. No-trait and low-sensitivity alex also still picked the expensive option at 150% (17% and 83% of answers), so the ladder is extended to 200%.
+
+These prices were chosen after seeing results, so they are a follow-up and not part of the original plan.
+
+| extra cost | dinner: `prepared` (cook is £4) | groceries: `deliver` (collect is £30) | headphones: `wireless` (wired is £25) |
+| --- | --- | --- | --- |
+| 15% | £4.60 | £34.50 | £28.75 |
+| 40% | £5.60 | £42 | £35 |
+| 60% | £6.40 | £48 | £40 |
+| 70% | £6.80 | £51 | £42.50 |
+| 90% | £7.60 | £57 | £47.50 |
+| 110% | £8.40 | £63 | £52.50 |
+| 120% | £8.80 | £66 | £55 |
+| 130% | £9.20 | £69 | £57.50 |
+| 140% | £9.60 | £72 | £60 |
+| 160% | £10.40 | £78 | £65 |
+| 170% | £10.80 | £81 | £67.50 |
+| 180% | £11.20 | £84 | £70 |
+| 190% | £11.60 | £87 | £72.50 |
+| 200% | £12 | £90 | £75 |
+
+What stays the same: the 5 alex versions, the 6 starter scenarios, the prompt, the model (gpt-5.1-2025-11-13), the runner settings and the two rounds. Only the price of the expensive option changes.
+
+Number of calls: 5 alex versions x 14 new prices x 3 base-scenarios x 2 orders = 420 calls per round, 840 in total. Together with the first 840 this gives 1,680 answers.
+
+Rules for reading the results: unchanged, except that "more than 150%" becomes "more than 200%".
+
+Files: `experiment_1/generate_inputs.ipynb` now writes
+
+- `scenarios.jsonl`: 168 scenarios, the original 84 first and unchanged
+- `trials_r1.jsonl` and `trials_r2.jsonl`: 840 trials each, the original 420 first and unchanged
+- `trials_r1_new.jsonl` and `trials_r2_new.jsonl`: only the 420 new trials; these are the files that are run
+
+The input files exactly as used in rounds 1 and 2 are saved in `runs/rq1-round1/inputs` and `runs/rq1-round2/inputs`.
+
+Limitation: the new prices are answered in a later session than the original prices, with the same model version and settings.
+
+Commands:
+
+Run `experiment_1/generate_inputs.ipynb` first, then from the repository root in the same order as before: check, prepare, round 1 extra (420 paid calls), round 2 extra (420 paid calls). `--max-calls 420` also makes the runner refuse the full 840-trial files.
+
+```sh
+python3 run.py check \
+  --trials experiment_1/trials_r1_new.jsonl \
+  --scenarios experiment_1/scenarios.jsonl
+
+python3 run.py prepare \
+  --trials experiment_1/trials_r1_new.jsonl \
+  --scenarios experiment_1/scenarios.jsonl \
+  --max-calls 420 \
+  --out runs/rq1-round1-extra-preview
+
+python3 run.py run \
+  --trials experiment_1/trials_r1_new.jsonl \
+  --scenarios experiment_1/scenarios.jsonl \
+  --max-calls 420 \
+  --out runs/rq1-round1-extra
+
+python3 run.py run \
+  --trials experiment_1/trials_r2_new.jsonl \
+  --scenarios experiment_1/scenarios.jsonl \
+  --max-calls 420 \
+  --out runs/rq1-round2-extra
+```
