@@ -1,0 +1,7 @@
+Simulate a choice for the fictional person described in the user message. Consider the supplied persona description, situation, and options. Select exactly one listed option.
+
+Return a JSON object with exactly two keys:
+- "choice_id": the selected option_id, copied exactly.
+- "explanation": one or two sentences explaining the choice from the person's perspective.
+
+Do not add Markdown or any text outside the JSON object.
